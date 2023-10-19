@@ -19,8 +19,8 @@ class Airport(models.Model):
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route")
-    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route")
+    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route_source")
+    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route_destination")
     distance = models.IntegerField()
 
     def __str__(self):
@@ -57,6 +57,9 @@ class Flight(models.Model):
 
     def __str__(self):
         return f"Flight {self.route}. Departure: {self.departure_time}. Arrival: {self.arrival_time}"
+
+    class Meta:
+        ordering = ["departure_time"]
 
 
 class Order(models.Model):
