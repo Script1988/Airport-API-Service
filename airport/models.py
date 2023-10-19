@@ -15,3 +15,12 @@ class Airport(models.Model):
 
     def __str__(self):
         return f"Airport name: {self.name}"
+
+
+class Route(models.Model):
+    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route")
+    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route")
+    distance = models.IntegerField()
+
+    def __str__(self):
+        return f"Fly from {self.source} to {self.destination}. Distance: {self.distance}"
