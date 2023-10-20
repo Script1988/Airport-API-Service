@@ -31,7 +31,15 @@ class RouteListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Route
-        fields = ("source", "destination", "distance")
+        fields = ("id", "source", "destination")
+
+
+class RouteDetailSerializer(RouteListSerializer):
+    closest_big_city = serializers.CharField(source="destination.closest_big_city", read_only=True)
+
+    class Meta:
+        model = Route
+        fields = ("source", "destination", "distance", "closest_big_city")
 
 
 class AirplaneTypeSerializer(serializers.ModelSerializer):
