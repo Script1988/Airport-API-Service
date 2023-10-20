@@ -78,8 +78,8 @@ class Order(models.Model):
 class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
-    flight = models.ForeignKey(Flight, on_delete=models.DO_NOTHING, related_name="ticket")
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order")
+    flight = models.ForeignKey(Flight, on_delete=models.DO_NOTHING, related_name="tickets")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
 
     def __str__(self):
         return f"Flight: {self.flight}. Row number: {self.row}, seat: {self.seat}"
