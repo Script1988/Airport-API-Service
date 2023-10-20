@@ -35,11 +35,12 @@ class RouteListSerializer(serializers.ModelSerializer):
 
 
 class RouteDetailSerializer(RouteListSerializer):
-    closest_big_city = serializers.CharField(source="destination.closest_big_city", read_only=True)
+    source_closest_big_city = serializers.CharField(source="source.closest_big_city", read_only=True)
+    destination_closest_big_city = serializers.CharField(source="destination.closest_big_city", read_only=True)
 
     class Meta:
         model = Route
-        fields = ("source", "destination", "distance", "closest_big_city")
+        fields = ("source", "source_closest_big_city", "destination", "destination_closest_big_city", "distance")
 
 
 class AirplaneTypeSerializer(serializers.ModelSerializer):
@@ -62,7 +63,16 @@ class FlightListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = ("source", "destination", "departure_time", "arrival_time")
+        fields = ("id", "source", "destination", "departure_time", "arrival_time")
+
+
+class FlightDetailSerializer(FlightListSerializer):
+    crew = serializers.StringRelatedField(many=True)
+    airplane = AirplaneListSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Flight
+        fields = ("source", "destination", "departure_time", "arrival_time", "crew", "airplane")
 
 
 class TicketSerializer(serializers.ModelSerializer):

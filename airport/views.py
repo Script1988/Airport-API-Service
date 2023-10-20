@@ -15,6 +15,7 @@ from airport.serializers import (
     AirplaneTypeSerializer,
     AirplaneListSerializer,
     FlightListSerializer,
+    FlightDetailSerializer,
 )
 
 
@@ -68,6 +69,12 @@ class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.select_related("route", "airplane").prefetch_related("crew")
     serializer_class = FlightListSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return FlightDetailSerializer
+
+        return self.serializer_class
 
 
 class OrderPagination(PageNumberPagination):
