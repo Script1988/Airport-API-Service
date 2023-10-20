@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.pagination import PageNumberPagination
 
-from airport.models import Order, Crew, Airport, Route, AirplaneType, Airplane
+from airport.models import Order, Crew, Airport, Route, AirplaneType, Airplane, Flight
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 from airport.serializers import (
     OrderSerializer,
@@ -13,6 +13,7 @@ from airport.serializers import (
     RouteListSerializer,
     AirplaneTypeSerializer,
     AirplaneListSerializer,
+    FlightListSerializer,
 )
 
 
@@ -55,6 +56,11 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     serializer_class = AirplaneListSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
+
+class FlightViewSet(viewsets.ModelViewSet):
+    queryset = Flight.objects.select_related("route", "airplane").prefetch_related("crew")
+    serializer_class = FlightListSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class OrderPagination(PageNumberPagination):
