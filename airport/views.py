@@ -3,9 +3,31 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.pagination import PageNumberPagination
 
-from airport.models import Order
+from airport.models import Order, Crew, Airport
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
-from airport.serializers import OrderSerializer, OrderListSerializer
+from airport.serializers import OrderSerializer, OrderListSerializer, CrewSerializer, AirportSerializer
+
+
+class CrewViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    GenericViewSet,
+):
+    queryset = Crew.objects.all()
+    serializer_class = CrewSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+
+class AirportViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    GenericViewSet,
+):
+    queryset = Airport.objects.all()
+    serializer_class = AirportSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class OrderPagination(PageNumberPagination):
@@ -16,6 +38,7 @@ class OrderPagination(PageNumberPagination):
 class OrderViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
     GenericViewSet,
 ):
     queryset = Order.objects.prefetch_related(
