@@ -2,6 +2,7 @@ from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import F, Count
 
 from airport.models import Order, Crew, Airport, Route, AirplaneType, Airplane, Flight
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
@@ -66,7 +67,12 @@ class AirplaneViewSet(viewsets.ModelViewSet):
 
 
 class FlightViewSet(viewsets.ModelViewSet):
-    queryset = Flight.objects.select_related("route", "airplane").prefetch_related("crew")
+    queryset = Flight.objects.select_related("route", "airplane").prefetch_related("crew").annotate(
+            tickets_available=(
+                F("airplane__rows") * F("airplane__seats_in_row")
+                - Count("tickets")
+            )
+        )
     serializer_class = FlightListSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
