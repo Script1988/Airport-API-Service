@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
@@ -70,11 +73,11 @@ class AirplaneViewSet(viewsets.ModelViewSet):
 
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.select_related("route", "airplane").prefetch_related("crew").annotate(
-            tickets_available=(
+        tickets_available=(
                 F("airplane__rows") * F("airplane__seats_in_row")
                 - Count("tickets")
-            )
         )
+    )
     serializer_class = FlightListSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
@@ -118,31 +121,40 @@ class FlightViewSet(viewsets.ModelViewSet):
 
         return queryset.distinct()
 
-    # @extend_schema(
-    #     parameters=[
-    #         OpenApiParameter(
-    #             "source",
-    #             type=OpenApiTypes.STR,
-    #             description="Filter by flight source airport (ex. ?title=Heathrow)",
-    #         ),
-    #         OpenApiParameter(
-    #             "destination",
-    #             type=OpenApiTypes.STR,
-    #             description="Filter by flight destination airport (ex. ?title=Heathrow)",
-    #         ),
-    #         OpenApiParameter(
-    #             "date",
-    #             type=OpenApiTypes.DATE,
-    #             description=(
-    #                     "Filter by flight departure time"
-    #                     "(ex. ?date=2023-10-23)"
-    #                 ),
-    #             ),
-    #         ]
-    #     )
-    #
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "source_airport",
+                type=OpenApiTypes.STR,
+                description="Filter by flight source airport (ex. ?source_airport=Heathrow)",
+            ),
+            OpenApiParameter(
+                "source_city",
+                type=OpenApiTypes.STR,
+                description="Filter by flight source city (ex. ?source_city=London)",
+            ),
+            OpenApiParameter(
+                "destination_airport",
+                type=OpenApiTypes.STR,
+                description="Filter by flight destination airport (ex. ?destination_airport=Heathrow)",
+            ),
+            OpenApiParameter(
+                "destination_city",
+                type=OpenApiTypes.STR,
+                description="Filter by flight destination city (ex. ?destination_city=London)",
+            ),
+            OpenApiParameter(
+                "departure_time",
+                type=OpenApiTypes.DATE,
+                description=(
+                        "Filter by flight departure time"
+                        "(ex. ?date=2023-10-23)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class OrderPagination(PageNumberPagination):
