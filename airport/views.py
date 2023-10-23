@@ -23,6 +23,7 @@ from airport.serializers import (
 class CrewViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
     GenericViewSet,
 ):
@@ -81,6 +82,21 @@ class FlightViewSet(viewsets.ModelViewSet):
             return FlightDetailSerializer
 
         return self.serializer_class
+
+    def get_queryset(self):
+        """Filtering the flights"""
+        source = self.request.query_params.get("source")
+        destination = self.request.query_params.get("destination")
+
+        queryset = self.queryset
+
+        if source:
+            queryset = queryset.filter(route__source__name__icontains=source)
+
+        if destination:
+            queryset = queryset.filter(route__destination__name__icontains=destination)
+
+        return queryset.distinct()
 
 
 class OrderPagination(PageNumberPagination):

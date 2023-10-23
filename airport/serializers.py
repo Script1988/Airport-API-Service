@@ -13,12 +13,6 @@ from airport.models import (
 )
 
 
-class CrewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Crew
-        fields = ("id", "first_name", "last_name")
-
-
 class AirportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airport
@@ -41,6 +35,12 @@ class RouteDetailSerializer(RouteListSerializer):
     class Meta:
         model = Route
         fields = ("source", "source_closest_big_city", "destination", "destination_closest_big_city", "distance")
+
+
+class CrewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Crew
+        fields = ("id", "first_name", "last_name")
 
 
 class AirplaneTypeSerializer(serializers.ModelSerializer):
