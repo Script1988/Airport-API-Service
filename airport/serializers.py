@@ -89,9 +89,20 @@ class FlightDetailSerializer(FlightListSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+
+    def validate(self, attrs):
+        data = super(TicketSerializer, self).validate(attrs)
+        Ticket.validate_ticket(attrs["row"], attrs["seat"], attrs["flight"], serializers.ValidationError)
+
+        return data
+
     class Meta:
         model = Ticket
-        fields = ("id", "row", "seat", "flight", "order")
+        fields = ("id", "row", "seat", "flight")
+
+
+class TicketListSerializer(TicketSerializer):
+    flight = FlightListSerializer(many=False, read_only=True)
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -110,5 +121,5 @@ class OrderSerializer(serializers.ModelSerializer):
             return order
 
 
-class OrderListSerializer:
-    pass
+class OrderListSerializer(OrderSerializer):
+    tickets = TicketListSerializer(many=True, read_only=True)
