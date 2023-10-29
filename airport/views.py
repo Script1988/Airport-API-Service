@@ -20,7 +20,7 @@ from airport.serializers import (
     AirplaneTypeSerializer,
     AirplaneListSerializer,
     FlightListSerializer,
-    FlightDetailSerializer,
+    FlightDetailSerializer, RouteSerializer,
 )
 
 
