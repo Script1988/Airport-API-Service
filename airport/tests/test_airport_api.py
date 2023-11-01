@@ -254,7 +254,6 @@ class AuthenticatedAirportApiTests(TestCase):
         result = self.client.get(queryset_url)
         result_data = [(key, value) for key, value in result.data[0].items()]
         response_data = {k[0]: k[1] for k in result_data}
-        print(response_data)
 
         serializer1 = FlightListSerializer(flight1)
         serializer2 = FlightListSerializer(flight2)

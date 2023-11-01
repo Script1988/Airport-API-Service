@@ -42,7 +42,13 @@ class RouteDetailSerializer(RouteSerializer):
 
     class Meta:
         model = Route
-        fields = ("source", "source_closest_big_city", "destination", "destination_closest_big_city", "distance")
+        fields = (
+            "source",
+            "source_closest_big_city",
+            "destination",
+            "destination_closest_big_city",
+            "distance"
+        )
 
 
 class CrewSerializer(serializers.ModelSerializer):
@@ -68,7 +74,15 @@ class AirplaneListSerializer(AirplaneSerializer):
 
     class Meta:
         model = Airplane
-        fields = ("id", "name", "rows", "seats_in_row", "airplane_type", "airplane_type_name", "capacity")
+        fields = (
+            "id",
+            "name",
+            "rows",
+            "seats_in_row",
+            "airplane_type",
+            "airplane_type_name",
+            "capacity"
+        )
 
 
 class FlightSerializer(serializers.ModelSerializer):
