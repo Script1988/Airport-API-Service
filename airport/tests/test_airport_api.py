@@ -159,6 +159,21 @@ class AuthenticatedAirportApiTests(TestCase):
         result = self.client.post(AIRPLANE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_create_flight_forbidden(self):
+        route = sample_route()
+        crew = sample_crew()
+        airplane = sample_airplane()
+        payload = {
+            "route": route.id,
+            "airplane": airplane.id,
+            "departure_time": "2023-10-21",
+            "arrival_time": "2023-10-22",
+            "crew": crew.id,
+        }
+
+        result = self.client.post(FLIGHT_URL, payload)
+        self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_crew_list(self):
         result = self.client.get(CREW_URL)
         crew = Crew.objects.all()
@@ -347,18 +362,17 @@ class AdminApiTests(TestCase):
         result = self.client.post(AIRPLANE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
+    def test_create_flight_allowed(self):
+        route = sample_route()
+        crew = sample_crew()
+        airplane = sample_airplane()
+        payload = {
+            "route": route.id,
+            "airplane": airplane.id,
+            "departure_time": "2023-10-21",
+            "arrival_time": "2023-10-22",
+            "crew": crew.id,
+        }
 
-
-# def test_create_movie(self):
-#        actor = Actor.objects.create(first_name="Test", last_name="Try")
-#        genre = Genre.objects.create(name="Genre")
-#        payload = {
-#            "title": "Test",
-#            "description": "Test",
-#            "duration": 120,
-#            "actors": actor.id,
-#            "genres": genre.id,
-#        }
-#        res = self.client.post(MOVIE_URL, payload)
-#
-#        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        result = self.client.post(FLIGHT_URL, payload)
+        self.assertEqual(result.status_code, status.HTTP_201_CREATED)

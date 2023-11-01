@@ -31,24 +31,7 @@ class RouteListSerializer(RouteSerializer):
 
     class Meta:
         model = Route
-        fields = ("id", "source", "source_airport", "destination", "destination_airport", "distance")
-
-    # def create(self, validated_data):
-    #     source_data = validated_data.pop("source")
-    #     destination_data = validated_data.pop("destination")
-    #     distance_data = validated_data.pop("distance")
-    #
-    #     source, created = Airport.objects.get_or_create(name=source_data)
-    #     destination, created = Airport.objects.get_or_create(name=destination_data)
-    #     distance, created = Route.objects.get_or_create(name=distance_data)
-    #
-    #     route = Route.objects.create(
-    #         source=source,
-    #         destination=destination,
-    #         distance=distance,
-    #         **validated_data
-    #     )
-    #     return route
+        fields = ("id",  "source_airport",  "destination_airport", )
 
 
 class RouteDetailSerializer(RouteSerializer):
@@ -88,14 +71,27 @@ class AirplaneListSerializer(AirplaneSerializer):
         fields = ("id", "name", "rows", "seats_in_row", "airplane_type", "airplane_type_name", "capacity")
 
 
-class FlightListSerializer(serializers.ModelSerializer):
+class FlightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Flight
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crew")
+
+
+class FlightListSerializer(FlightSerializer):
     source = serializers.CharField(source="route.source.name", read_only=True)
     destination = serializers.CharField(source="route.destination.name", read_only=True)
     tickets_available = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Flight
-        fields = ("id", "source", "destination", "departure_time", "arrival_time", "tickets_available")
+        fields = (
+            "id",
+            "source",
+            "destination",
+            "departure_time",
+            "arrival_time",
+            "tickets_available"
+        )
 
 
 class FlightDetailSerializer(FlightListSerializer):

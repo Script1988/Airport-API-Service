@@ -20,7 +20,9 @@ from airport.serializers import (
     AirplaneTypeSerializer,
     AirplaneListSerializer,
     FlightListSerializer,
-    FlightDetailSerializer, RouteSerializer,
+    FlightDetailSerializer,
+    RouteSerializer,
+    FlightSerializer,
 )
 
 
@@ -38,10 +40,12 @@ class AirportViewSet(viewsets.ModelViewSet):
 
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.select_related("source", "destination")
-    serializer_class = RouteListSerializer
+    serializer_class = RouteSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
+        if self.action == "list":
+            return RouteListSerializer
         if self.action == "retrieve":
             return RouteDetailSerializer
 
@@ -67,10 +71,12 @@ class FlightViewSet(viewsets.ModelViewSet):
                 - Count("tickets")
         )
     )
-    serializer_class = FlightListSerializer
+    serializer_class = FlightSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
+        if self.action == "list":
+            return FlightListSerializer
         if self.action == "retrieve":
             return FlightDetailSerializer
 
