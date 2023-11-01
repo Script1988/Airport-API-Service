@@ -16,13 +16,13 @@ class Airport(models.Model):
     closest_big_city = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f"Airport name: {self.name}"
+        return self.name
 
 
 class Route(models.Model):
     source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route_source")
     destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="route_destination")
-    distance = models.IntegerField(null=True, blank=True)
+    distance = models.IntegerField(default=2000)
 
     def __str__(self):
         return f"Fly from {self.source} to {self.destination}. Distance: {self.distance}"

@@ -135,6 +135,19 @@ class AuthenticatedAirportApiTests(TestCase):
         result = self.client.post(AIRPLANE_TYPE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_create_route_forbidden(self):
+        source = sample_airport()
+        destination = sample_airport(name="Paris", closest_big_city="Paris")
+        payload = {
+            "source": source.id,
+            "destination": destination.id,
+            "distance": 3000,
+        }
+
+        result = self.client.post(ROUTE_URL, payload)
+
+        self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_crew_list(self):
         result = self.client.get(CREW_URL)
         crew = Crew.objects.all()
@@ -203,6 +216,68 @@ class AuthenticatedAirportApiTests(TestCase):
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
+    def test_filter_flight_by_source_airport(self):
+        airport = Airport.objects.create(name="Borispol", closest_big_city="Kyiv")
+        route = sample_route(source=airport)
+
+        flight1 = sample_flight(route=route)
+        flight2 = sample_flight()
+        flight3 = sample_flight()
+
+        queryset_url = f"{FLIGHT_URL}?source_airport={flight1.route.source.name}"
+        result = self.client.get(queryset_url)
+        result_data = [(key, value) for key, value in result.data[0].items()]
+        response_data = {k[0]: k[1] for k in result_data}
+        print(response_data)
+
+        serializer1 = FlightListSerializer(flight1)
+        serializer2 = FlightListSerializer(flight2)
+        serializer3 = FlightListSerializer(flight3)
+
+        self.assertIn(serializer1.data["source"], response_data["source"])
+        self.assertNotIn(serializer2.data["source"], response_data["source"])
+        self.assertNotIn(serializer3.data["source"], response_data["source"])
+
+    def test_filter_flight_by_destination_airport(self):
+        airport = Airport.objects.create(name="Heathrow", closest_big_city="London")
+        route = sample_route(destination=airport)
+
+        flight1 = sample_flight(route=route)
+        flight2 = sample_flight()
+        flight3 = sample_flight()
+
+        queryset_url = f"{FLIGHT_URL}?destination_airport={flight1.route.destination.name}"
+        result = self.client.get(queryset_url)
+        result_data = [(key, value) for key, value in result.data[0].items()]
+        response_data = {k[0]: k[1] for k in result_data}
+
+        serializer1 = FlightListSerializer(flight1)
+        serializer2 = FlightListSerializer(flight2)
+        serializer3 = FlightListSerializer(flight3)
+
+        self.assertIn(serializer1.data["destination"], response_data["destination"])
+        self.assertNotIn(serializer2.data["destination"], response_data["destination"])
+        self.assertNotIn(serializer3.data["destination"], response_data["destination"])
+
+    def test_filter_flight_by_departure_time(self):
+        flight1 = sample_flight()
+        flight2 = sample_flight(departure_time="2023-10-20")
+        flight3 = sample_flight(departure_time="2023-10-21")
+
+        queryset_url = f"{FLIGHT_URL}?departure_time={flight1.departure_time}"
+        result = self.client.get(queryset_url)
+
+        serializer1 = FlightListSerializer(flight1)
+        serializer2 = FlightListSerializer(flight2)
+        serializer3 = FlightListSerializer(flight3)
+        result_data = [(key, value) for key, value in result.data[0].items()]
+        response_data = {k[0]: k[1] for k in result_data}
+        data_to_check = response_data["departure_time"].split("T00")[0]
+
+        self.assertIn(serializer1.data["departure_time"], data_to_check)
+        self.assertNotIn(serializer2.data["departure_time"], data_to_check)
+        self.assertNotIn(serializer3.data["departure_time"], data_to_check)
+
 
 class AdminApiTests(TestCase):
     def setUp(self) -> None:
@@ -237,6 +312,19 @@ class AdminApiTests(TestCase):
         result = self.client.post(AIRPLANE_TYPE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
+    def test_create_route_allowed(self):
+        source = sample_airport()
+        destination = sample_airport(name="Paris", closest_big_city="Paris")
+        payload = {
+            "source": source.id,
+            "destination": destination.id,
+            "distance": 3000,
+        }
+
+        result = self.client.post(ROUTE_URL, payload)
+
+        self.assertEqual(result.status_code, status.HTTP_201_CREATED)
+
     # def test_create_airplane_allowed(self):
     #     airplane_type = sample_airplane_type()
     #     payload = {
@@ -248,29 +336,18 @@ class AdminApiTests(TestCase):
     #     result = self.client.post(AIRPLANE_URL, payload)
     #     self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
-    # def test_create_route_allowed(self):
-    #     source = sample_airport()
-    #     destination = sample_airport(name="Paris", closest_big_city="Paris")
-    #     payload = {
-    #         "source": source.id,
-    #         "destination": destination.id,
-    #         "distance": 3000,
-    #     }
-    #
-    #     result = self.client.post(ROUTE_URL, payload)
-    #
-    #     self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
- # def test_create_movie(self):
- #        actor = Actor.objects.create(first_name="Test", last_name="Try")
- #        genre = Genre.objects.create(name="Genre")
- #        payload = {
- #            "title": "Test",
- #            "description": "Test",
- #            "duration": 120,
- #            "actors": actor.id,
- #            "genres": genre.id,
- #        }
- #        res = self.client.post(MOVIE_URL, payload)
- #
- #        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+# def test_create_movie(self):
+#        actor = Actor.objects.create(first_name="Test", last_name="Try")
+#        genre = Genre.objects.create(name="Genre")
+#        payload = {
+#            "title": "Test",
+#            "description": "Test",
+#            "duration": 120,
+#            "actors": actor.id,
+#            "genres": genre.id,
+#        }
+#        res = self.client.post(MOVIE_URL, payload)
+#
+#        self.assertEqual(res.status_code, status.HTTP_201_CREATED)

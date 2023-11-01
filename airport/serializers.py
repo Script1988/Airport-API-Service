@@ -26,28 +26,34 @@ class RouteSerializer(serializers.ModelSerializer):
 
 
 class RouteListSerializer(RouteSerializer):
-    source = serializers.CharField(source="source.name", read_only=True)
-    destination = serializers.CharField(source="destination.name", read_only=True)
-
-    # source = serializers.SlugRelatedField(slug_field="name", read_only=False)
-    # destination = serializers.SlugRelatedField(slug_field="name", read_only=False)
+    source_airport = serializers.CharField(source="source.name", read_only=True)
+    destination_airport = serializers.CharField(source="destination.name", read_only=True)
 
     class Meta:
         model = Route
-        fields = ("id", "source", "destination", "distance")
+        fields = ("id", "source", "source_airport", "destination", "destination_airport", "distance")
 
     # def create(self, validated_data):
     #     source_data = validated_data.pop("source")
     #     destination_data = validated_data.pop("destination")
+    #     distance_data = validated_data.pop("distance")
     #
     #     source, created = Airport.objects.get_or_create(name=source_data)
     #     destination, created = Airport.objects.get_or_create(name=destination_data)
+    #     distance, created = Route.objects.get_or_create(name=distance_data)
     #
-    #     route = Route.objects.create(source=source, destination=destination, **validated_data)
+    #     route = Route.objects.create(
+    #         source=source,
+    #         destination=destination,
+    #         distance=distance,
+    #         **validated_data
+    #     )
     #     return route
 
 
 class RouteDetailSerializer(RouteSerializer):
+    source = serializers.CharField(source="source.name", read_only=True)
+    destination = serializers.CharField(source="destination.name", read_only=True)
     source_closest_big_city = serializers.CharField(source="source.closest_big_city", read_only=True)
     destination_closest_big_city = serializers.CharField(source="destination.closest_big_city", read_only=True)
 
