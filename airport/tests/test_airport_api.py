@@ -148,6 +148,17 @@ class AuthenticatedAirportApiTests(TestCase):
 
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_create_airplane_forbidden(self):
+        airplane_type = sample_airplane_type()
+        payload = {
+            "name": "Test Airplane",
+            "rows": 50,
+            "seats_in_row": 6,
+            "airplane_type": airplane_type.id,
+        }
+        result = self.client.post(AIRPLANE_URL, payload)
+        self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_crew_list(self):
         result = self.client.get(CREW_URL)
         crew = Crew.objects.all()
@@ -325,16 +336,16 @@ class AdminApiTests(TestCase):
 
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
-    # def test_create_airplane_allowed(self):
-    #     airplane_type = sample_airplane_type()
-    #     payload = {
-    #         "name": "Test Airplane",
-    #         "rows": 50,
-    #         "seats_in_row": 6,
-    #         "airplane_type": airplane_type.id,
-    #     }
-    #     result = self.client.post(AIRPLANE_URL, payload)
-    #     self.assertEqual(result.status_code, status.HTTP_201_CREATED)
+    def test_create_airplane_allowed(self):
+        airplane_type = sample_airplane_type()
+        payload = {
+            "name": "Test Airplane",
+            "rows": 50,
+            "seats_in_row": 6,
+            "airplane_type": airplane_type.id,
+        }
+        result = self.client.post(AIRPLANE_URL, payload)
+        self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
 
 

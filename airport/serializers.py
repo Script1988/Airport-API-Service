@@ -71,15 +71,21 @@ class CrewSerializer(serializers.ModelSerializer):
 class AirplaneTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AirplaneType
-        fields = ("name",)
+        fields = ("id", "name",)
 
 
-class AirplaneListSerializer(serializers.ModelSerializer):
-    airplane_type = serializers.CharField(source="airplane_type.name", read_only=True)
+class AirplaneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Airplane
+        fields = ("id", "name", "rows", "seats_in_row", "airplane_type")
+
+
+class AirplaneListSerializer(AirplaneSerializer):
+    airplane_type_name = serializers.CharField(source="airplane_type.name", read_only=True)
 
     class Meta:
         model = Airplane
-        fields = ("name", "rows", "seats_in_row", "airplane_type", "capacity")
+        fields = ("id", "name", "rows", "seats_in_row", "airplane_type", "airplane_type_name", "capacity")
 
 
 class FlightListSerializer(serializers.ModelSerializer):
