@@ -79,19 +79,13 @@ WSGI_APPLICATION = "airport_service.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "airport",
-        "USER": os.environ["POSTGRES_USER"],
-        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
         "HOST": "127.0.0.1",
         "PORT": "5432",
     }
