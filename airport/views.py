@@ -2,7 +2,7 @@ from datetime import datetime
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.pagination import PageNumberPagination
@@ -14,6 +14,7 @@ from airport.serializers import (
     OrderSerializer,
     OrderListSerializer,
     CrewSerializer,
+    CrewDetailSerializer,
     AirportSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
@@ -30,6 +31,12 @@ class CrewViewSet(viewsets.ModelViewSet):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return CrewDetailSerializer
+
+        return self.serializer_class
 
 
 class AirportViewSet(viewsets.ModelViewSet):

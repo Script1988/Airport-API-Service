@@ -31,7 +31,7 @@ class RouteListSerializer(RouteSerializer):
 
     class Meta:
         model = Route
-        fields = ("id",  "source_airport",  "destination_airport", )
+        fields = ("id",  "source_airport",  "destination_airport")
 
 
 class RouteDetailSerializer(RouteSerializer):
@@ -54,13 +54,19 @@ class RouteDetailSerializer(RouteSerializer):
 class CrewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crew
-        fields = ("id", "first_name", "last_name")
+        fields = ("id", "first_name", "last_name", "image")
+
+
+class CrewDetailSerializer(CrewSerializer):
+    class Meta:
+        model = Crew
+        fields = ("first_name", "last_name", "image")
 
 
 class AirplaneTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AirplaneType
-        fields = ("id", "name",)
+        fields = ("id", "name")
 
 
 class AirplaneSerializer(serializers.ModelSerializer):
@@ -111,8 +117,14 @@ class FlightListSerializer(FlightSerializer):
 class FlightDetailSerializer(FlightListSerializer):
     crew = serializers.StringRelatedField(many=True)
     airplane = AirplaneListSerializer(many=False, read_only=True)
-    source_closest_big_city = serializers.CharField(source="route.source.closest_big_city", read_only=True)
-    destination_closest_big_city = serializers.CharField(source="route.destination.closest_big_city", read_only=True)
+    source_closest_big_city = serializers.CharField(
+        source="route.source.closest_big_city",
+        read_only=True
+    )
+    destination_closest_big_city = serializers.CharField(
+        source="route.destination.closest_big_city",
+        read_only=True
+    )
 
     class Meta:
         model = Flight
@@ -132,7 +144,12 @@ class TicketSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs)
-        Ticket.validate_ticket(attrs["row"], attrs["seat"], attrs["flight"], serializers.ValidationError)
+        Ticket.validate_ticket(
+            attrs["row"],
+            attrs["seat"],
+            attrs["flight"],
+            serializers.ValidationError
+        )
 
         return data
 

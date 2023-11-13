@@ -2,10 +2,13 @@ from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 
+from airport.utils import crew_image_file_path
+
 
 class Crew(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+    image = models.ImageField(null=True, upload_to=crew_image_file_path)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
