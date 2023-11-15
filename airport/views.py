@@ -1,10 +1,12 @@
 from datetime import datetime
+from typing import Type
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.serializers import Serializer
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import F, Count
 
@@ -32,7 +34,7 @@ class CrewViewSet(viewsets.ModelViewSet):
     serializer_class = CrewSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "retrieve":
             return CrewDetailSerializer
 
@@ -50,7 +52,7 @@ class RouteViewSet(viewsets.ModelViewSet):
     serializer_class = RouteSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "list":
             return RouteListSerializer
         if self.action == "retrieve":
@@ -81,7 +83,7 @@ class FlightViewSet(viewsets.ModelViewSet):
     serializer_class = FlightSerializer
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "list":
             return FlightListSerializer
         if self.action == "retrieve":
@@ -89,7 +91,7 @@ class FlightViewSet(viewsets.ModelViewSet):
 
         return self.serializer_class
 
-    def get_queryset(self):
+    def get_queryset(self) -> str:
         """Filtering the flights"""
         source_airport = self.request.query_params.get("source_airport")
         source_city = self.request.query_params.get("source_city")
@@ -155,7 +157,7 @@ class FlightViewSet(viewsets.ModelViewSet):
             ),
         ]
     )
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs) -> tuple:
         return super().list(request, *args, **kwargs)
 
 
@@ -177,14 +179,14 @@ class OrderViewSet(
     pagination_class = OrderPagination
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> Order:
         return Order.objects.filter(user=self.request.user)
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "list":
             return OrderListSerializer
 
         return self.serializer_class
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(user=self.request.user)

@@ -24,7 +24,7 @@ AIRPLANE_URL = reverse("airport:airplane-list")
 FLIGHT_URL = reverse("airport:flight-list")
 
 
-def sample_crew(**params):
+def sample_crew(**params) -> Crew:
     default = {
         "first_name": "Test name",
         "last_name": "Last name"
@@ -34,7 +34,7 @@ def sample_crew(**params):
     return Crew.objects.create(**default)
 
 
-def sample_airport(**params):
+def sample_airport(**params) -> Airport:
     default = {
         "name": "Test airport",
         "closest_big_city": "London"
@@ -44,7 +44,7 @@ def sample_airport(**params):
     return Airport.objects.create(**default)
 
 
-def sample_route(**params):
+def sample_route(**params) -> Route:
     source = sample_airport()
     destination = sample_airport()
     default = {
@@ -57,7 +57,7 @@ def sample_route(**params):
     return Route.objects.create(**default)
 
 
-def sample_airplane_type(**params):
+def sample_airplane_type(**params) -> AirplaneType:
     default = {
         "name": "Test airplane type",
     }
@@ -66,7 +66,7 @@ def sample_airplane_type(**params):
     return AirplaneType.objects.create(**default)
 
 
-def sample_airplane(**params):
+def sample_airplane(**params) -> Airplane:
     airplane_type = sample_airplane_type()
     default = {
         "name": "Test airplane",
@@ -79,7 +79,7 @@ def sample_airplane(**params):
     return Airplane.objects.create(**default)
 
 
-def sample_flight(**params):
+def sample_flight(**params) -> Flight:
     route = sample_route()
     airplane = sample_airplane()
     default = {
@@ -97,7 +97,7 @@ class UnauthenticatedMovieApiTests(TestCase):
     def setUp(self) -> None:
         self.client = APIClient()
 
-    def test_auth_required(self):
+    def test_auth_required(self) -> None:
         res = self.client.get(FLIGHT_URL)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -112,7 +112,7 @@ class AuthenticatedAirportApiTests(TestCase):
         )
         self.client.force_authenticate(self.user)
 
-    def test_create_crew_forbidden(self):
+    def test_create_crew_forbidden(self) -> None:
         payload = {
             "first_name": "John",
             "last_name": "Brzenk",
@@ -120,7 +120,7 @@ class AuthenticatedAirportApiTests(TestCase):
         result = self.client.post(CREW_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_create_airport_forbidden(self):
+    def test_create_airport_forbidden(self) -> None:
         payload = {
             "name": "Test",
             "closest_big_city": "Test city",
@@ -128,14 +128,14 @@ class AuthenticatedAirportApiTests(TestCase):
         result = self.client.post(AIRPORT_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_create_airplane_type_forbidden(self):
+    def test_create_airplane_type_forbidden(self) -> None:
         payload = {
             "name": "Test AirplaneType",
         }
         result = self.client.post(AIRPLANE_TYPE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_create_route_forbidden(self):
+    def test_create_route_forbidden(self) -> None:
         source = sample_airport()
         destination = sample_airport(name="Paris", closest_big_city="Paris")
         payload = {
@@ -148,7 +148,7 @@ class AuthenticatedAirportApiTests(TestCase):
 
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_create_airplane_forbidden(self):
+    def test_create_airplane_forbidden(self) -> None:
         airplane_type = sample_airplane_type()
         payload = {
             "name": "Test Airplane",
@@ -159,7 +159,7 @@ class AuthenticatedAirportApiTests(TestCase):
         result = self.client.post(AIRPLANE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_create_flight_forbidden(self):
+    def test_create_flight_forbidden(self) -> None:
         route = sample_route()
         crew = sample_crew()
         airplane = sample_airplane()
@@ -174,28 +174,28 @@ class AuthenticatedAirportApiTests(TestCase):
         result = self.client.post(FLIGHT_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_crew_list(self):
+    def test_crew_list(self) -> None:
         result = self.client.get(CREW_URL)
         crew = Crew.objects.all()
         serializer = CrewSerializer(crew, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_airport_list(self):
+    def test_airport_list(self) -> None:
         result = self.client.get(AIRPORT_URL)
         airport = Airport.objects.all()
         serializer = AirportSerializer(airport, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_route_list(self):
+    def test_route_list(self) -> None:
         result = self.client.get(ROUTE_URL)
         route = Route.objects.all()
         serializer = RouteListSerializer(route, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_route_detail(self):
+    def test_route_detail(self) -> None:
         test_route = sample_route()
 
         route_detail_url = f"{ROUTE_URL}{test_route.id}/"
@@ -207,28 +207,28 @@ class AuthenticatedAirportApiTests(TestCase):
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_airplane_type_list(self):
+    def test_airplane_type_list(self) -> None:
         result = self.client.get(AIRPLANE_TYPE_URL)
         airplane_type = AirplaneType.objects.all()
         serializer = AirplaneTypeSerializer(airplane_type, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_airplane_list(self):
+    def test_airplane_list(self) -> None:
         result = self.client.get(AIRPLANE_URL)
         airplane = Airplane.objects.all()
         serializer = AirplaneListSerializer(airplane, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_flight_list(self):
+    def test_flight_list(self) -> None:
         result = self.client.get(FLIGHT_URL)
         flight = Flight.objects.all()
         serializer = FlightListSerializer(flight, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_flight_detail(self):
+    def test_flight_detail(self) -> None:
         test_flight = sample_flight()
 
         flight_detail_url = f"{FLIGHT_URL}{test_flight.id}/"
@@ -242,7 +242,7 @@ class AuthenticatedAirportApiTests(TestCase):
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_filter_flight_by_source_airport(self):
+    def test_filter_flight_by_source_airport(self) -> None:
         airport = Airport.objects.create(name="Borispol", closest_big_city="Kyiv")
         route = sample_route(source=airport)
 
@@ -263,7 +263,7 @@ class AuthenticatedAirportApiTests(TestCase):
         self.assertNotIn(serializer2.data["source"], response_data["source"])
         self.assertNotIn(serializer3.data["source"], response_data["source"])
 
-    def test_filter_flight_by_destination_airport(self):
+    def test_filter_flight_by_destination_airport(self) -> None:
         airport = Airport.objects.create(name="Heathrow", closest_big_city="London")
         route = sample_route(destination=airport)
 
@@ -284,7 +284,7 @@ class AuthenticatedAirportApiTests(TestCase):
         self.assertNotIn(serializer2.data["destination"], response_data["destination"])
         self.assertNotIn(serializer3.data["destination"], response_data["destination"])
 
-    def test_filter_flight_by_departure_time(self):
+    def test_filter_flight_by_departure_time(self) -> None:
         flight1 = sample_flight()
         flight2 = sample_flight(departure_time="2023-10-20")
         flight3 = sample_flight(departure_time="2023-10-21")
@@ -314,7 +314,7 @@ class AdminApiTests(TestCase):
         )
         self.client.force_authenticate(self.user)
 
-    def test_create_crew_allowed(self):
+    def test_create_crew_allowed(self) -> None:
         payload = {
             "first_name": "John",
             "last_name": "Brzenk",
@@ -322,7 +322,7 @@ class AdminApiTests(TestCase):
         result = self.client.post(CREW_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
-    def test_create_airport_allowed(self):
+    def test_create_airport_allowed(self) -> None:
         payload = {
             "name": "Test",
             "closest_big_city": "Test city",
@@ -330,14 +330,14 @@ class AdminApiTests(TestCase):
         result = self.client.post(AIRPORT_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
-    def test_create_airplane_type_allowed(self):
+    def test_create_airplane_type_allowed(self) -> None:
         payload = {
             "name": "Test AirplaneType",
         }
         result = self.client.post(AIRPLANE_TYPE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
-    def test_create_route_allowed(self):
+    def test_create_route_allowed(self) -> None:
         source = sample_airport()
         destination = sample_airport(name="Paris", closest_big_city="Paris")
         payload = {
@@ -350,7 +350,7 @@ class AdminApiTests(TestCase):
 
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
-    def test_create_airplane_allowed(self):
+    def test_create_airplane_allowed(self) -> None:
         airplane_type = sample_airplane_type()
         payload = {
             "name": "Test Airplane",
@@ -361,7 +361,7 @@ class AdminApiTests(TestCase):
         result = self.client.post(AIRPLANE_URL, payload)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
 
-    def test_create_flight_allowed(self):
+    def test_create_flight_allowed(self) -> None:
         route = sample_route()
         crew = sample_crew()
         airplane = sample_airplane()
