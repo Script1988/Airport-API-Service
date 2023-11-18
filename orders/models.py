@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
-from airport.models import Flight  # TODO:change to another
+from airport.models import Flight
 
 
 class Order(models.Model):

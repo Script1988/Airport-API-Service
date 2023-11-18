@@ -9,7 +9,14 @@ from rest_framework.serializers import Serializer
 
 from django.db.models import F, Count
 
-from airport.models import Crew, Airport, Route, AirplaneType, Airplane, Flight
+from airport.models import (
+    Crew,
+    Airport,
+    Route,
+    Flight,
+    AirplaneType,
+    Airplane
+)
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 from airport.serializers import (
     CrewSerializer,
@@ -17,12 +24,12 @@ from airport.serializers import (
     AirportSerializer,
     RouteListSerializer,
     RouteDetailSerializer,
-    AirplaneTypeSerializer,
-    AirplaneListSerializer,
     FlightListSerializer,
     FlightDetailSerializer,
     RouteSerializer,
     FlightSerializer,
+    AirplaneTypeSerializer,
+    AirplaneListSerializer,
 )
 
 
@@ -36,6 +43,18 @@ class CrewViewSet(viewsets.ModelViewSet):
             return CrewDetailSerializer
 
         return self.serializer_class
+
+
+class AirplaneTypeViewSet(viewsets.ModelViewSet):
+    queryset = AirplaneType.objects.all()
+    serializer_class = AirplaneTypeSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
+
+
+class AirplaneViewSet(viewsets.ModelViewSet):
+    queryset = Airplane.objects.select_related("airplane_type")
+    serializer_class = AirplaneListSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class AirportViewSet(viewsets.ModelViewSet):
@@ -56,18 +75,6 @@ class RouteViewSet(viewsets.ModelViewSet):
             return RouteDetailSerializer
 
         return self.serializer_class
-
-
-class AirplaneTypeViewSet(viewsets.ModelViewSet):
-    queryset = AirplaneType.objects.all()
-    serializer_class = AirplaneTypeSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
-
-
-class AirplaneViewSet(viewsets.ModelViewSet):
-    queryset = Airplane.objects.select_related("airplane_type")
-    serializer_class = AirplaneListSerializer
-    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
 
 class FlightViewSet(viewsets.ModelViewSet):
@@ -156,5 +163,3 @@ class FlightViewSet(viewsets.ModelViewSet):
     )
     def list(self, request, *args, **kwargs) -> tuple:
         return super().list(request, *args, **kwargs)
-
-

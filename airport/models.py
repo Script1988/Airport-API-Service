@@ -2,6 +2,27 @@ from django.db import models
 from airport.utils import crew_image_file_path
 
 
+class AirplaneType(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Airplane(models.Model):
+    name = models.CharField(max_length=255)
+    rows = models.IntegerField()
+    seats_in_row = models.IntegerField()
+    airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE, related_name="airplane")
+
+    @property
+    def capacity(self) -> int:
+        return self.rows * self.seats_in_row
+
+    def __str__(self) -> str:
+        return f"Airplane type: {self.airplane_type}. Total places: {self.capacity}"
+
+
 class Crew(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -26,27 +47,6 @@ class Route(models.Model):
 
     def __str__(self) -> str:
         return f"Fly from {self.source} to {self.destination}. Distance: {self.distance}"
-
-
-class AirplaneType(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self) -> str:
-        return self.name
-
-
-class Airplane(models.Model):
-    name = models.CharField(max_length=255)
-    rows = models.IntegerField()
-    seats_in_row = models.IntegerField()
-    airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE, related_name="airplane")
-
-    @property
-    def capacity(self) -> int:
-        return self.rows * self.seats_in_row
-
-    def __str__(self) -> str:
-        return f"Airplane type: {self.airplane_type}. Total places: {self.capacity}"
 
 
 class Flight(models.Model):

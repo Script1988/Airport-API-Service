@@ -1,18 +1,39 @@
 from rest_framework import serializers
-from airport.models import (
-    Crew,
-    Airport,
-    Route,
-    AirplaneType,
-    Airplane,
-    Flight,
-)
+from airport.models import Crew, Airport, Route, Flight, AirplaneType, Airplane
 
 
 class AirportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airport
         fields = ("id", "name", "closest_big_city")
+
+
+class AirplaneTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AirplaneType
+        fields = ("id", "name")
+
+
+class AirplaneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Airplane
+        fields = ("id", "name", "rows", "seats_in_row", "airplane_type")
+
+
+class AirplaneListSerializer(AirplaneSerializer):
+    airplane_type_name = serializers.CharField(source="airplane_type.name", read_only=True)
+
+    class Meta:
+        model = Airplane
+        fields = (
+            "id",
+            "name",
+            "rows",
+            "seats_in_row",
+            "airplane_type",
+            "airplane_type_name",
+            "capacity"
+        )
 
 
 class RouteSerializer(serializers.ModelSerializer):
@@ -57,34 +78,6 @@ class CrewDetailSerializer(CrewSerializer):
     class Meta:
         model = Crew
         fields = ("first_name", "last_name", "image")
-
-
-class AirplaneTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AirplaneType
-        fields = ("id", "name")
-
-
-class AirplaneSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Airplane
-        fields = ("id", "name", "rows", "seats_in_row", "airplane_type")
-
-
-class AirplaneListSerializer(AirplaneSerializer):
-    airplane_type_name = serializers.CharField(source="airplane_type.name", read_only=True)
-
-    class Meta:
-        model = Airplane
-        fields = (
-            "id",
-            "name",
-            "rows",
-            "seats_in_row",
-            "airplane_type",
-            "airplane_type_name",
-            "capacity"
-        )
 
 
 class FlightSerializer(serializers.ModelSerializer):
@@ -134,6 +127,3 @@ class FlightDetailSerializer(FlightListSerializer):
             "crew",
             "airplane",
         )
-
-
-
